@@ -12,15 +12,19 @@ import '../styles/global.css'
 		<meta name="generator" content={Astro.generator} />
 		<title>FlexSmart</title>
 	</head>
-	<body class=" bg-[#ffffff]  w-full h-screen">
-		
+	<body class=" bg-linear-to-r from-sky-300 from-30% via-sky-50 via-50% to-white to-80% w-full h-screen dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 transition-colors duration-500">
+    <button id="theme-toggle" class="fixed top-4 right-4 p-2 mt-5 mr-5 rounded-full bg-sky-50 dark:bg-gray-700 cursor-pointer transition-colors duration-500 z-50">
+    <svg id="theme-toggle-light-icon" class="hidden w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
+    <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6 text-slate-700" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+    </button>
 			<slot />
 		
 	</body>
 </html>
 
 <script is:inline>
-const theme = (() => {
+  // 1. Lógica de inicialización (evita el parpadeo)
+  const theme = (() => {
     if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
       return localStorage.getItem('theme');
     }
@@ -35,10 +39,35 @@ const theme = (() => {
   } else {
     document.documentElement.classList.add('dark');
   }
+
   window.localStorage.setItem('theme', theme);
 
+  // 2. Lógica del botón (ejecutada tras cargar el DOM)
+  document.addEventListener('DOMContentLoaded', () => {
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
 
+    // Mostrar el icono correcto inicialmente
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      lightIcon.classList.remove('hidden');
+    } else {
+      darkIcon.classList.remove('hidden');
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      // Alternar iconos
+      darkIcon.classList.toggle('hidden');
+      lightIcon.classList.toggle('hidden');
+
+      // Alternar clase dark en el html
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  });
 </script>
-<style>
-	
-</style>
